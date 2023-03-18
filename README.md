@@ -50,8 +50,6 @@ Let us start with a simple system call: stat. What happens when we run the stat 
 
  We know it must call the stat system call, but what exact C code identfier is called inside the kernel on the perimiter between user space and kernel space? 
 
-trace-cmd -p function_graph -g __sys_newfstat
-
 ```
 sudo trace-cmd record -p function_graph --max-graph-depth 10 -g __x64_sys_newfstat -F stat test.tx
 ```
@@ -60,9 +58,9 @@ sudo trace-cmd record -p function_graph --max-graph-depth 10 -g __x64_sys_newfst
 echo "linux" > test
 sudo trace-cmd record -p function_graph --max-graph-depth 2 -e syscalls -F stat test
 sudo trace-cmd report | less
-``
+```
 
-Reading the report, you will realize that the C identifiers for the system calls starts with "__x64_sys_". By searching for the regex "_sys_.*stat", we find:
+Reading the report, you will realize that the C identifiers for the system calls starts with \_\_x64\_sys\_. By searching for the regex "\_sys\_.\*stat", we find:
 ```
 stat-105448 [003] 95503.957132: funcgraph_entry:                   |  __x64_sys_newfstat() {
 stat-105448 [003] 95503.957132: funcgraph_entry:        2.219 us   |    vfs_fstat();
@@ -76,6 +74,6 @@ stat-105448 [003] 95503.957137: funcgraph_entry:        0.229 us   |    fpregs_a
 stat-105448 [003] 95503.957137: funcgraph_exit:         0.683 us   |  }
 ```
 
-We already get a reference to VFS: the function vfs_fstat.   Now that we have found our entrypoint into the kernel, let us increase the max depth of the function graph tracer and see what we get:
+We already get a reference to VFS: the function vfs\_fstat.   Now that we have found our entrypoint into the kernel, let us increase the max depth of the function graph tracer and see what we get:
 
 
