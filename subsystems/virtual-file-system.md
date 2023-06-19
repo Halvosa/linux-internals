@@ -144,3 +144,42 @@ struct file_operations {
 
 	...output omitted...
 ```
+
+The inode definition starts with:
+
+"include/linux/fs.h"
+```c 
+struct inode {
+        umode_t                 i_mode;
+        unsigned short          i_opflags;
+        kuid_t                  i_uid;
+        kgid_t                  i_gid;
+        unsigned int            i_flags;
+
+#ifdef CONFIG_FS_POSIX_ACL
+        struct posix_acl        *i_acl;
+        struct posix_acl        *i_default_acl;
+#endif
+
+        const struct inode_operations   *i_op;
+        struct super_block      *i_sb;
+        struct address_space    *i_mapping;
+```
+
+"include/linux/path.h"
+```
+struct path {
+        struct vfsmount *mnt;
+        struct dentry *dentry;
+} __randomize_layout;
+```
+
+"include/linux/mount.h"
+```
+struct vfsmount {
+        struct dentry *mnt_root;        /* root of the mounted tree */
+        struct super_block *mnt_sb;     /* pointer to superblock */
+        int mnt_flags;
+        struct user_namespace *mnt_userns;
+} __randomize_layout;
+```

@@ -1,0 +1,6 @@
+digraph linux {
+	"struct task_struct" -> "struct mm_struct";
+	"struct mm_struct" -> "struct task_struct";
+	"struct mm_struct" -> "struct vm_area_struct";
+	"struct mm_struct" -> "struct user_namespace";
+}
