@@ -1,5 +1,23 @@
 # Linux System Calls
 
+## Finding Syscall Source Code
+
+Syscall function definitions are defined using the SYSCALL\_DEFINE macros. The command `:ltag /^SYSCALL_DEFINE.` followed by `:lwindow` gives a searchable list containing all syscall definitions. For example, searching for "clone" (using regular '/' vim search) gives:
+<pre>
+216 ipc/mqueue.c|^\VSYSCALL\_DEFINE2(mq\_notify, mqd\_t, mqdes,\$| SYSCALL\_DEFINE2
+217 ipc/msg.c|^\VSYSCALL\_DEFINE2(msgget, key\_t, key, int, msgflg)\$| SYSCALL\_DEFINE2
+218 kernel/capability.c|^\VSYSCALL\_DEFINE2(capget, cap\_user\_header\_t, header, cap\_user\_data\_t, dataptr)\$| SYSCALL\_DEFINE2
+219 kernel/capability.c|^\VSYSCALL\_DEFINE2(capset, cap\_user\_header\_t, header, const cap\_user\_data\_t, data)\$| SYSCALL\_DEFINE2
+220 kernel/fork.c|^\VSYSCALL\_DEFINE2(<b>clone</b>3, struct clone\_args \_\_user \*, uargs, size\_t, size)\$| SYSCALL\_DEFINE2
+221 kernel/futex/syscalls.c|^\VSYSCALL\_DEFINE2(set\_robust\_list, struct robust\_list\_head \_\_user \*, head,\$| SYSCALL\_DEFINE2
+222 kernel/groups.c|^\VSYSCALL\_DEFINE2(getgroups, int, gidsetsize, gid\_t \_\_user \*, grouplist)\$| SYSCALL\_DEFINE2
+223 kernel/groups.c|^\VSYSCALL\_DEFINE2(setgroups, int, gidsetsize, gid\_t \_\_user \*, grouplist)\$| SYSCALL\_DEFINE2
+224 kernel/module/main.c|^\VSYSCALL\_DEFINE2(delete\_module, const char \_\_user \*, name\_user,\$| SYSCALL\_DEFINE2
+225 kernel/nsproxy.c|^\VSYSCALL\_DEFINE2(setns, int, fd, int, flags)\$| SYSCALL\_DEFINE2
+[Location List] ltag /^SYSCALL\_DEFINE.                                                                                                    220,34          36%
+/clone
+</pre>
+
 ## Implementation of Calling Convention
 
 
