@@ -744,6 +744,69 @@ struct task_struct {
 };
 ```
 
+
+## The Clone System Call
+
+The man page for clone says.....
+
+From `kernel/fork.c`:
+```c
+/**
+ * clone3 - create a new process with specific properties
+ * @uargs: argument structure
+ * @size:  size of @uargs
+ *
+ * clone3() is the extensible successor to clone()/clone2().
+ * It takes a struct as argument that is versioned by its size.
+ *
+ * Return: On success, a positive PID for the child process.
+ *         On error, a negative errno number.
+ */
+SYSCALL_DEFINE2(clone3, struct clone_args __user *, uargs, size_t, size)
+{
+	int err;
+
+	struct kernel_clone_args kargs;
+	pid_t set_tid[MAX_PID_NS_LEVEL];
+
+	kargs.set_tid = set_tid;
+
+	err = copy_clone_args_from_user(&kargs, uargs, size);
+	if (err)
+		return err;
+
+	if (!clone3_args_valid(&kargs))
+		return -EINVAL;
+
+	return kernel_clone(&kargs);
+}
+```
+
+From `include/linux/sched/task.h`:
+```c
+struct kernel_clone_args {
+	u64 flags;
+	int __user *pidfd;
+	int __user *child_tid;
+	int __user *parent_tid;
+	int exit_signal;
+	unsigned long stack;
+	unsigned long stack_size;
+	unsigned long tls;
+	pid_t *set_tid;
+	/* Number of elements in *set_tid */
+	size_t set_tid_size;
+	int cgroup;
+	int io_thread;
+	int kthread;
+	int idle;
+	int (*fn)(void *);
+	void *fn_arg;
+	struct cgroup *cgrp;
+	struct css_set *cset;
+};
+```
+
 ## The Execve System Call
 
 

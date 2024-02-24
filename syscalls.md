@@ -14,15 +14,48 @@ Syscall function definitions are defined using the SYSCALL\_DEFINE macros. The c
 223 kernel/groups.c|^\VSYSCALL\_DEFINE2(setgroups, int, gidsetsize, gid\_t \_\_user \*, grouplist)\$| SYSCALL\_DEFINE2
 224 kernel/module/main.c|^\VSYSCALL\_DEFINE2(delete\_module, const char \_\_user \*, name\_user,\$| SYSCALL\_DEFINE2
 225 kernel/nsproxy.c|^\VSYSCALL\_DEFINE2(setns, int, fd, int, flags)\$| SYSCALL\_DEFINE2
-[Location List] ltag /^SYSCALL\_DEFINE.                                                                                                    220,34          36%
+[Location List] ltag /^SYSCALL\_DEFINE.
 /clone
 </pre>
+
+Hitting enter on entry 220 takes us to the syscall definition for clone3:
+```
+/**
+ * clone3 - create a new process with specific properties
+ * @uargs: argument structure
+ * @size:  size of @uargs
+ *
+ * clone3() is the extensible successor to clone()/clone2().
+ * It takes a struct as argument that is versioned by its size.
+ *
+ * Return: On success, a positive PID for the child process.
+ *         On error, a negative errno number.
+ */
+SYSCALL_DEFINE2(clone3, struct clone_args __user *, uargs, size_t, size)
+{
+	int err;
+
+	struct kernel_clone_args kargs;
+	pid_t set_tid[MAX_PID_NS_LEVEL];
+
+	kargs.set_tid = set_tid;
+
+	err = copy_clone_args_from_user(&kargs, uargs, size);
+	if (err)
+		return err;
+
+	if (!clone3_args_valid(&kargs))
+		return -EINVAL;
+
+	return kernel_clone(&kargs);
+}
+``` 
 
 ## Implementation of Calling Convention
 
 
 The below is taken from `tools/include/nolibc/arch-x86_64.h`:
-```
+```c
 /* Syscalls for x86_64 :
  *   - registers are 64-bit
  *   - syscall number is passed in rax
@@ -89,3 +122,7 @@ The below is taken from `tools/include/nolibc/arch-x86_64.h`:
 	_ret;                                                                 \
 })
 ```
+
+## Man Pages
+
+Before digging deep into the system call source code, it is a good idea to study the relevant man pages first. 
